@@ -152,7 +152,7 @@ ggplot(merged,aes(x = preg_preeclampsia, y = NPPB, color = mat_vitD_group)) +
        x = "Pregnancy Condition", y = "NPPB Gene Expression", color = "Vitamin D Level") +
   scale_color_manual(values = c("orange", "blue")) +
   my_theme +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5)) 
 
 ```
 

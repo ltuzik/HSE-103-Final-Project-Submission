@@ -3,8 +3,10 @@ title: "Final Project - Submission 1"
 output:
   pdf_document: default
   html_document: default
+author: Lauren Tuzik
 date: "2026-10-17"
 ---
+Extra Resources Used: Utilized AI for troubleshooting purposes. 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)

@@ -136,7 +136,7 @@ ggplot(merged, aes(x = NPPB))+
 
 ggplot(merged, aes(x = mat_age_yrs, y = NPPB, color = mat_age_yrs))+ 
   geom_point()+
-  labs(title = "Materal Age vs NPPB Gene Expression", x = "Maternal Age (Years)", 
+  labs(title = "Maternal Age vs NPPB Gene Expression", x = "Maternal Age (Years)", 
        y = "NPPB Gene Expression", 
        color = "Maternal Age (Years)") +
   my_theme +

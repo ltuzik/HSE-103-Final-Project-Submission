@@ -21,7 +21,7 @@ expData <- read.csv("/Users/laurentuzik/Desktop/Dartmouth/FALL/HSE 103 - Foundat
 namesData <- read.csv("/Users/laurentuzik/Desktop/Dartmouth/FALL/HSE 103 - Foundations of Data Science/Final project/GSE85307_geneNames.csv")
 
 #head(covarData)
-#head(expData) ## need to make geoID into column and preseve X 
+#head(expData) ## need to make geoID into column and preserve X 
 #head(namesData)
 
 ```

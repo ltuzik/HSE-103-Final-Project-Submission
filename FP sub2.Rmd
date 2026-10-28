@@ -225,69 +225,6 @@ all_plots(fun_hist, fun_scatter, fun_box)
 ```
 
 
-Check plots to see if they are right or if the functions somehow messed them up: 
-
-```{r}
-ggplot(merged, aes(x = MYL2))+ 
-  # fill blue with black outline
-  geom_histogram(fill = "blue", color = "black") +
-  labs(title = "Histogram of MYL2 Gene Expression", x = "Gene Expression", y = "Frequency")+
-  my_theme +
-  # want a centered title 
-  theme(plot.title = element_text(hjust = 0.5))
-
-ggplot(merged, aes(x = PLN))+ 
-  # fill blue with black outline
-  geom_histogram(fill = "blue", color = "black") +
-  labs(title = "Histogram of PLN Gene Expression", x = "Gene Expression", y = "Frequency")+
-  my_theme +
-  # want a centered title 
-  theme(plot.title = element_text(hjust = 0.5))
-
-
-ggplot(merged, aes(x = mat_age_yrs, y = MYL2, color = mat_age_yrs))+ 
-  geom_point()+
-  labs(title = "Maternal Age vs MYL2 Gene Expression", x = "Maternal Age (Years)", 
-       y = "NPPB Gene Expression", 
-       color = "Maternal Age (Years)") +
-  my_theme +
-  theme(plot.title = element_text(hjust = 0.5))
-
-
-ggplot(merged, aes(x = mat_age_yrs, y = PLN, color = mat_age_yrs))+ 
-  geom_point()+
-  labs(title = "Maternal Age vs PLN Gene Expression", x = "Maternal Age (Years)", 
-       y = "NPPB Gene Expression", 
-       color = "Maternal Age (Years)") +
-  my_theme +
-  theme(plot.title = element_text(hjust = 0.5))
-
-
-set.seed(4)
-ggplot(merged,aes(x = preg_preeclampsia, y = MYL2, color = mat_vitD_group)) +
-  geom_boxplot()+
-  geom_jitter (position = position_jitterdodge())+
-  labs(title = "MYL2 Gene Expression by Preeclampsia and Vitamin D Group", 
-       x = "Pregnancy Condition", y = "NPPB Gene Expression", color = "Vitamin D Level") +
-  scale_color_manual(values = c("orange", "blue")) +
-  my_theme +
-  theme(plot.title = element_text(hjust = 0.5))
-
-set.seed(4)
-ggplot(merged,aes(x = preg_preeclampsia, y = PLN, color = mat_vitD_group)) +
-  geom_boxplot()+
-  geom_jitter (position = position_jitterdodge())+
-  labs(title = "PLN Gene Expression by Preeclampsia and Vitamin D Group", 
-       x = "Pregnancy Condition", y = "NPPB Gene Expression", color = "Vitamin D Level") +
-  scale_color_manual(values = c("orange", "blue")) +
-  my_theme +
-  theme(plot.title = element_text(hjust = 0.5))
-
-
-
-```
-
-
 
 
 

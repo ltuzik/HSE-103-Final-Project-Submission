@@ -13,6 +13,7 @@ Extra Resources Used: Utilized AI for troubleshooting purposes.
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
 ```{r}
 library(ggplot2)
 
@@ -29,6 +30,7 @@ namesData <- read.csv("/Users/laurentuzik/Desktop/Dartmouth/FALL/HSE 103 - Found
 
 ```
 
+## Submission 1
 
 ```{r}
 
@@ -221,6 +223,10 @@ all_plots <- function(fun_hist, fun_scatter, fun_box) {
 }
 
 all_plots(fun_hist, fun_scatter, fun_box)
+
+# for future use/correct syntax:
+# X = .data[[gene]]
+
 
 ```
 

@@ -83,7 +83,8 @@ merged$mat_vitD <- as.numeric(sub(".*:", "", merged$mat_vitD))
 
 ## then subset into groups for the derived categorical variable from a continuous
 ## low = <30; high = >=30
-merged$mat_vitD_group <- ifelse(merged$mat_vitD <30, "Insufficient (<30 ng/mL)", "Sufficient (≥30 ng/mL)")
+merged$mat_vitD_group <- ifelse(merged$mat_vitD <30, "Insufficient (<30 ng/mL)", 
+                                "Sufficient (≥30 ng/mL)")
 
 #class(merged$mat_age_yrs) # is chr - need to change to numeric 
 ## can use same format as vitamin d 
@@ -180,7 +181,8 @@ fun_hist <- function(df, gene) {
   # [[]] to select the value of the gene expression within the columns
   ggplot(df, aes(df[[gene]])) +
   geom_histogram(fill = "blue", color = "black") +
-  labs(title = paste0("Histogram of ", gene, " Gene Expression"), x = "Gene Expression", y = "Frequency") +
+  labs(title = paste0("Histogram of ", gene, " Gene Expression"), x = "Gene Expression",
+       y = "Frequency") +
   my_theme
 }
 

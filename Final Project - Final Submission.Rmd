@@ -1,0 +1,345 @@
+---
+title: "Final Project - Final Submission"
+output:
+  pdf_document:
+    latex_engine: xelatex
+  html_document: default
+author: Lauren Tuzik
+date: "2026-11-5"
+---
+Extra Resources Used: Utilized AI for troubleshooting purposes. 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(ggplot2)
+
+## import data
+covarData <- read.csv("/Users/laurentuzik/Desktop/Dartmouth/FALL/HSE 103 - Foundations of Data Science/Final project/GSE85307_covar-1.csv")
+
+expData <- read.csv("/Users/laurentuzik/Desktop/Dartmouth/FALL/HSE 103 - Foundations of Data Science/Final project/GSE85307_geneExpression.csv")
+
+namesData <- read.csv("/Users/laurentuzik/Desktop/Dartmouth/FALL/HSE 103 - Foundations of Data Science/Final project/GSE85307_geneNames.csv")
+
+#head(covarData)
+#head(expData) ## need to make geoID into column and preserve X 
+#head(namesData)
+
+```
+
+## Submission 1
+
+```{r}
+
+## need to switch X (ProbeID) and geoID in expression data 
+## want to save the X column data 
+X <- expData$X
+## first - need to make ProbeID/X the row names 
+## want to keep X attached to its corresponding data
+rownames(expData) <- expData$X
+#head(expData)
+## then need to delete the X column because it is now the row names 
+expData <- expData[ , -1]
+#head(expData)
+## then transpose the data - so the rows become columns/columns become rows
+expData_t <- as.data.frame(t(expData))
+#head(expData_t)
+## lost the X so i can restore 
+#colnames(expData_t) <- X
+#head(expData_t)
+
+## change the probeID to gene name in the merged sheet 
+# ?match()
+names(expData_t) <- namesData$GENE[match(names(expData_t), namesData$PROBEID)]
+#head(expData_t)
+
+## need to add a geoID label on the first cell of the sheet 
+expData_t$geoID <- rownames(expData_t)
+#head(expData_t)
+
+## can then merge data on geoID variable 
+merged <- merge(covarData, expData_t, by = "geoID")
+
+```
+
+
+```{r}
+
+## All submitted plots must be made using ggplot2 and must be of publication quality
+## Identify one gene, one continuous covariate, and two categorical covariates of interest. 
+## At least one categorical variable should be derived from a continuous variable
+## gene - NPPB 
+## one continuous covariate - mat_age_years
+## two categorical covariates, one must be derived - 
+## preg_preclampsia, mat_vitD_group 
+
+# class(merged$mat_vitD) - its chr - will need to change to numeric so i can group
+# head(merged$mat_vitD) - contains a string before the numbers - will need to remove
+## substitute everything up to : with "" empty space in the mat_vitD variable from merged
+merged$mat_vitD <- as.numeric(sub(".*:", "", merged$mat_vitD))
+
+## then subset into groups for the derived categorical variable from a continuous
+## low = <30; high = >=30
+merged$mat_vitD_group <- ifelse(merged$mat_vitD <30, "Insufficient (<30 ng/mL)", 
+                                "Sufficient (≥30 ng/mL)")
+
+#class(merged$mat_age_yrs) # is chr - need to change to numeric 
+## can use same format as vitamin d 
+merged$mat_age_yrs <- as.numeric(sub(".*:", "", merged$mat_age_yrs))
+#head(merged$mat_age_yrs)
+
+# head(merged$preg_preeclampsia) - need to change to normal and preclampsia only 
+## use sub 
+merged$preg_preeclampsia <- sub(".*:", "", merged$preg_preeclampsia)
+#head(merged$preg_preeclampsia)
+
+```
+
+
+```{r}
+
+## define a nice theme for my plots 
+
+my_theme <- theme(
+        # Remove all the extra borders and grid lines
+        panel.border = element_blank(), panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), 
+        # Define  axis
+        axis.line = element_line(colour = "black", linewidth = rel(1)),
+        # Set plot background
+        plot.background = element_rect(fill = "white"),
+        panel.background = element_blank(),
+        legend.key = element_rect(fill = 'white'), 
+        # Move legend
+        legend.position = 'top', 
+        plot.title = element_text(hjust = 0.5))
+
+```
+
+
+```{r}
+
+## 1 Histogram of Gene Expression
+# library(ggplot2)
+ggplot(merged, aes(x = NPPB))+ 
+  # fill blue with black outline
+  geom_histogram(fill = "blue", color = "black") +
+  labs(title = "Histogram of NPPB Gene Expression", x = "Gene Expression", y = "Frequency")+
+  my_theme +
+  # want a centered title 
+  theme(plot.title = element_text(hjust = 0.5))
+
+```
+
+```{r}
+## 1 Scatterplot of Covariate vs. Gene Expression
+# class(merged$mat_age_yrs) - is chr - go back and change to numeric 
+
+ggplot(merged, aes(x = mat_age_yrs, y = NPPB, color = mat_age_yrs))+ 
+  geom_point()+
+  labs(title = "Maternal Age vs NPPB Gene Expression", x = "Maternal Age (Years)", 
+       y = "NPPB Gene Expression", 
+       color = "Maternal Age (Years)") +
+  my_theme +
+  theme(plot.title = element_text(hjust = 0.5))
+
+```
+
+
+```{r}
+## 1 Boxplot of Gene Expression Separated by Both Categorical Variables
+
+set.seed(4)
+
+ggplot(merged,aes(x = preg_preeclampsia, y = NPPB, color = mat_vitD_group)) +
+  geom_boxplot()+
+  geom_jitter (position = position_jitterdodge())+
+  labs(title = "NPPB Gene Expression by Preeclampsia and Vitamin D Group", 
+       x = "Pregnancy Condition", y = "NPPB Gene Expression", color = "Vitamin D Level") +
+  scale_color_manual(values = c("orange", "blue")) +
+  my_theme +
+  theme(plot.title = element_text(hjust = 0.5))
+
+```
+
+
+## Submission 2 
+Identify 2 additional genes (3 total)
+- MYL2
+- PLN 
+Build a function that produces the plots for submission 1 above. 
+  - Your function should loop through all genes provided to it to produce the plots from your first submission (including 1 continuous covariate and 2 categorical covariates). 
+
+```{r}
+
+# function for building - Histogram of Gene Expression
+fun_hist <- function(df, gene) {
+  # [[]] to select the value of the gene expression within the columns
+  ggplot(df, aes(df[[gene]])) +
+  geom_histogram(fill = "blue", color = "black") +
+  labs(title = bquote("Histogram of " *italic(.(gene))* " Gene Expression"), x = "Gene Expression",
+       y = "Frequency") +
+  my_theme
+}
+
+# function for building - Scatterplot of Covariate vs. Gene Expression
+fun_scatter <- function(df, x, gene){
+  ggplot(df, aes(x = df[[x]], y = df[[gene]], color = df[[x]]))+ 
+  geom_point()+
+  labs(title = bquote("Maternal Age vs " *italic(.(gene))* " Gene Expression"), x = "Maternal Age (Years)", 
+       y = bquote(italic(.(gene))* " Gene Expression"), 
+       color = "Maternal Age (Years)") +
+  my_theme 
+}
+
+# function for building - Boxplot of Gene Expression Separated by Both Categorical Variables
+fun_box <- function(df, x, gene) {
+  set.seed(4)
+  ggplot(df, aes(x = df[[x]],  y = df[[gene]], color = mat_vitD_group)) +
+    geom_boxplot()+
+    geom_jitter (position = position_jitterdodge())+
+    labs(title = bquote(italic(.(gene))* " Gene Expression by Preeclampsia and Vitamin D Group"), 
+         x = "Pregnancy Condition", y = bquote(italic(.(gene))* " Gene Expression"), color = "Vitamin D Level") +
+    scale_color_manual(values = c("orange", "blue")) +
+    my_theme 
+}
+
+```
+
+
+```{r}
+# revision based on feedback from submission 2 
+# list of genes to loop through 
+geneList <- c("NPPB", "MYL2", "PLN")
+
+allPlots2 <- function(merged, geneList) {
+  for(i in 1:length(geneList)) {
+    print(fun_hist(merged, geneList[i]))
+    
+    print(fun_scatter(merged, "mat_age_yrs", geneList[i]))
+    
+    print(fun_box(merged, "preg_preeclampsia", geneList[i]))
+  }
+}
+
+allPlots2(merged, geneList)
+
+```
+
+
+## Final Submission 
+
+Your final project should be submitted as a formatted LaTeX document with the following sections:
+Methods 
+•	Describe and cite the data source including initial sample size
+•	Final sample size and justification for removing any data points (if applicable) 
+•	Describe any analyses conducted
+•	Cite software and packages (and versions used)
+•	Link GitHub repository
+Results 
+•	Description of the findings of each table/figure (outlined below). For each item, provide a brief statement referencing and interpreting them and then cite the relevant table or figure, as discussed in class. Example: “Gene x was not associated with covariate y (Figure 2).” All items must be typeset with captions/figure legends as discussed in class. 
+•	Summary statistics table (LaTeX formatted) with all covariates you looked at and 2 additional continuous covariates (3 continuous, 2 categorical total), stratified a categorical covariate
+•	Publication quality plots from submission 2 (incorporating any previous feedback)
+•	Publication quality heatmap (10 genes, tracking bars for 2 categorical variables, clustering)
+•	One additional plot type not previously discussed in class to visualize your data in a new and unique way. Be creative! See list at end of document for plot types that would not count. 
+References
+At a minimum, your references must include the original paper that the dataset came from and any R packages used. All references should be cited within the text as shown in class.
+
+
+```{r}
+# 1 Table of Summary Statistics
+#install.packages("table1")
+library("table1")
+# 3 continuous, 2 categorical total), stratified a categorical covariate
+# 3 continuous: maternal age, delivery weeks, BMI
+# 2 categorical: vitamin D status, preeclampsia status 
+
+# clean two more 
+merged$delivery_gestAge_wks <- as.numeric(sub(".*:", "", merged$delivery_gestAge_wks))
+#str(merged$delivery_gestAge_wks)
+
+merged$mat_BMI <- as.numeric(sub(".*:", "", merged$mat_BMI))
+#str(merged$mat_BMI)
+
+# fix labels 
+label(merged$mat_age_yrs) <- "Maternal Age (Years)"
+label(merged$mat_vitD_group) <- "Maternal Vitamin D Status"
+label(merged$delivery_gestAge_wks) <- "Gestational Age at Delivery (Weeks)"
+label(merged$mat_BMI) <- "Maternal Body Mass Index"
+
+# create table one with age and vitamin d group by preeclampisa status
+table1 <- table1(~ mat_age_yrs + mat_vitD_group + delivery_gestAge_wks + mat_BMI | preg_preeclampsia, 
+                 data = merged, 
+                 caption = "Table 1. Characteristics of Study Population")
+                 
+table1
+
+```
+
+
+```{r}
+# 9 Final Plots from Submission 2 (Histogram, Scatter Plot, Boxplot) 
+
+
+```
+
+
+```{r}
+# 1 Heatmap - 10 genes, tracking bars for 2 categorical variables, clustering
+# already chosen genes: NPPB, MYL2, PLN 
+# 7 additional: 
+# NKX2-5, TBX20, CRYAB, AKAP6, PDE2A, CDH2, ACTG2 
+#install.packages("pheatmap", repos = "https://cloud.r-project.org")
+library(pheatmap)
+genes <- c("NPPB", "MYL2", "PLN", "NKX2-5", "TBX20", "CRYAB", "AKAP6", 
+                  "PDE2A", "CDH2", "ACTG2")
+genes <- as.matrix(merged[, genes])
+rownames <- rownames(genes)
+rownames(annotationData1) <- rownames(merged)
+
+#head(merged[c("NPPB", "MYL2", "PLN", "NKX2-5","TBX20", "CRYAB", "AKAP6", "PDE2A", "ACTG2", "CDH2")])
+#head(genes)
+
+# for tracking bar
+# follow notes from 06 data analytics class 
+set.seed(4)
+annotationData1 <- data.frame(row.names = rownames(merged), 
+  Preeclampsia = factor(trimws(merged$preg_preeclampsia)), 
+  VitaminD = factor(trimws(merged$mat_vitD_group)))
+
+
+annotationColors <- list(Preeclampsia = c("Preeclampsia" = "pink", 
+                                          "Normal" = "purple"), 
+                         VitaminD = c("Insufficient (<30 ng/mL)" = "orange", 
+                                      "Sufficient (≥30 ng/mL)" = "blue"))
+
+pheatmap(genes, 
+         annotation_col = annotationData1, 
+         annotation_colors = annotationColors, 
+         scale = "column")
+
+
+```
+
+
+```{r}
+# 1 Additional Plot (See Below) - The following plots types would not count towards 
+# the “additional plot” for the final submission:
+# Scatter plots, Histograms, Density plots, Violin plots, Correlation plots, Heatmaps
+
+```
+
+
+Also, 
+- LaTeX Document Formatting All Above Components
+- GitHub Repository + Pushes from All Submissions
+- Knitted R Markdown File with Well Commented Code (PDF amd Rmd File)
+- Presentation 
+
+
+
+
+

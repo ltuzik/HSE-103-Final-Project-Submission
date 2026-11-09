@@ -1,7 +1,7 @@
 ---
 title: "Final Project - Final Submission"
 output:
-  pdf_document:
+  pdf_document: 
     latex_engine: xelatex
   html_document: default
 author: Lauren Tuzik
@@ -222,6 +222,7 @@ allPlots2 <- function(merged, geneList) {
     print(fun_scatter(merged, "mat_age_yrs", geneList[i]))
     
     print(fun_box(merged, "preg_preeclampsia", geneList[i]))
+  
   }
 }
 
@@ -277,7 +278,13 @@ table1 <- table1(~ mat_age_yrs + mat_vitD_group + delivery_gestAge_wks + mat_BMI
                  
 table1
 
+
 ```
+
+```{r}
+write.csv(table1, "/Users/laurentuzik/Desktop/Dartmouth/FALL/HSE 103 - Foundations of Data Science/Final Project/Table1.csv", row.names = F)
+```
+
 
 
 ```{r}
@@ -292,35 +299,38 @@ table1
 # already chosen genes: NPPB, MYL2, PLN 
 # 7 additional: 
 # NKX2-5, TBX20, CRYAB, AKAP6, PDE2A, CDH2, ACTG2 
-#install.packages("pheatmap", repos = "https://cloud.r-project.org")
+#install.packages("pheatmap")
 library(pheatmap)
-genes <- c("NPPB", "MYL2", "PLN", "NKX2-5", "TBX20", "CRYAB", "AKAP6", 
-                  "PDE2A", "CDH2", "ACTG2")
-genes <- as.matrix(merged[, genes])
-rownames <- rownames(genes)
-rownames(annotationData1) <- rownames(merged)
 
-#head(merged[c("NPPB", "MYL2", "PLN", "NKX2-5","TBX20", "CRYAB", "AKAP6", "PDE2A", "ACTG2", "CDH2")])
-#head(genes)
+# extract and transpose the genes of interest
+genes_heat_df <- t(merged[ , c("NPPB", "MYL2", "PLN", "NKX2-5", "TBX20", "CRYAB", "AKAP6", 
+                  "PDE2A", "CDH2", "ACTG2")])
+colnames(genes_heat_df) <- rownames(merged)
 
 # for tracking bar
 # follow notes from 06 data analytics class 
+
 set.seed(4)
-annotationData1 <- data.frame(row.names = rownames(merged), 
-  Preeclampsia = factor(trimws(merged$preg_preeclampsia)), 
-  VitaminD = factor(trimws(merged$mat_vitD_group)))
+annotationData2 <- data.frame(row.names = colnames(genes_heat_df), 
+                              "preg_preeclampsia" = factor(merged$preg_preeclampsia),
+                              "mat_vitD_group" = factor(merged$mat_vitD_group))
+colnames(annotationData2) <- c("Pregnancy Status", "Maternal Vitamin D Group")
 
-
-annotationColors <- list(Preeclampsia = c("Preeclampsia" = "pink", 
-                                          "Normal" = "purple"), 
-                         VitaminD = c("Insufficient (<30 ng/mL)" = "orange", 
+annotationColors <- list(`Pregnancy Status`= c(" Preeclampsia" = "pink", 
+                                          " Normal" = "purple"), 
+                         `Maternal Vitamin D Group` = c("Insufficient (<30 ng/mL)" = "orange", 
                                       "Sufficient (≥30 ng/mL)" = "blue"))
 
-pheatmap(genes, 
-         annotation_col = annotationData1, 
+pheatmap(genes_heat_df,
+         clustering_distance_cols = 'euclidean',
+         clustering_distance_rows = 'euclidean',
+         annotation_col = annotationData2,
          annotation_colors = annotationColors, 
-         scale = "column")
-
+         cluster_cols = T, 
+         cluster_rows = T,
+         clustering_method = "complete",
+         main = "Gene Expression Heatmap", 
+         show_colnames = F)
 
 ```
 

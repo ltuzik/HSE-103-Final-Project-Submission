@@ -282,7 +282,7 @@ table1
 ```
 
 ```{r}
-write.csv(table1, "/Users/laurentuzik/Desktop/Dartmouth/FALL/HSE 103 - Foundations of Data Science/Final Project/Table1.csv", row.names = F)
+#write.csv(table1, "/Users/laurentuzik/Desktop/Dartmouth/FALL/HSE 103 - Foundations of Data Science/Final Project/Table1.csv", #row.names = F)
 ```
 
 
@@ -321,6 +321,7 @@ annotationColors <- list(`Pregnancy Status`= c(" Preeclampsia" = "pink",
                          `Maternal Vitamin D Group` = c("Insufficient (<30 ng/mL)" = "orange", 
                                       "Sufficient (≥30 ng/mL)" = "blue"))
 
+# remove the participant id - its clustered together and not presentation ready 
 pheatmap(genes_heat_df,
          clustering_distance_cols = 'euclidean',
          clustering_distance_rows = 'euclidean',
@@ -339,6 +340,104 @@ pheatmap(genes_heat_df,
 # 1 Additional Plot (See Below) - The following plots types would not count towards 
 # the “additional plot” for the final submission:
 # Scatter plots, Histograms, Density plots, Violin plots, Correlation plots, Heatmaps
+
+# i want to examine how the 10 gene expression levels vary by preeclampsia status
+# utilize circular bar plot -  uses coord_polar() within ggplot2 
+
+# create list to of genes to find means of - 10 genes used in heatmap
+geneList2 <- merged[ , c("NPPB", "MYL2", "PLN", "NKX2-5", "TBX20", "CRYAB", "AKAP6", 
+                  "PDE2A", "CDH2", "ACTG2")]
+
+gene_means <- colMeans(geneList2)
+#print(gene_means)
+
+gene_means_df <- data.frame(Gene = names(gene_means), 
+                            mean_exp = gene_means)
+#View(gene_means_df)
+
+# now create plot with gene means df
+# want to color by the genes 
+#?theme()
+# geom_col to plot the mean values from df 
+ggplot(gene_means_df, aes(x = Gene, y = mean_exp, fill = Gene)) +
+  geom_col() +
+  coord_polar() + 
+  labs(title = "Mean Gene Expression") +
+  # need to clean up the plot 
+  # remove the x and y axis, the ticks, and numbers 
+  # need to make gene names smaller so they dont get cut off 
+  theme(axis.title = element_blank(), 
+        axis.ticks = element_blank(), 
+        axis.line.x.bottom = element_blank(), 
+        axis.line.y = element_blank(), 
+        axis.text.y = element_blank(), 
+        axis.text = element_text(size = 7.5)) +
+  my_theme
+
+```
+
+
+```{r}
+
+# make 2 circular bar plots for preeclampsia vs normal 
+# create list to of genes to find means of - 10 genes used in heatmap
+# from previous circular bar plot 
+#geneList2 <- merged[ , c("NPPB", "MYL2", "PLN", "NKX2-5", "TBX20", "CRYAB", "AKAP6", 
+#                  "PDE2A", "CDH2", "ACTG2")]
+
+pre_all <- merged[ifelse(merged$preg_preeclampsia == " Preeclampsia", T, F), ]
+#View(pre_df)
+pre_df_genes <- pre_all[ , c("NPPB", "MYL2", "PLN", "NKX2-5", "TBX20", "CRYAB", "AKAP6", 
+                  "PDE2A", "CDH2", "ACTG2")]
+pre_means <- colMeans(pre_df_genes)
+
+pre_means_df <- data.frame(Gene = names(pre_means), 
+                            mean_exp = pre_means)
+#View(pre_means_df)
+
+
+normal_all <- merged[ifelse(merged$preg_preeclampsia == " Normal", T, F), ]
+#View(normal_df)
+normal_df_genes <- normal_all[ , c("NPPB", "MYL2", "PLN", "NKX2-5", "TBX20", "CRYAB", "AKAP6", 
+                  "PDE2A", "CDH2", "ACTG2")]
+normal_means <- colMeans(normal_df_genes)
+
+normal_means_df <- data.frame(Gene = names(normal_means), 
+                            mean_exp = normal_means)
+#View(normal_means_df)
+
+
+ggplot(pre_means_df, aes(x = Gene, y = mean_exp, fill = Gene)) +
+  geom_col() +
+  coord_polar() + 
+  labs(title = "Mean Gene Expression - Pregnancy Status: Preeclampsia") +
+  # need to clean up the plot 
+  # remove the x and y axis, the ticks, and numbers 
+  # need to make gene names smaller so they dont get cut off 
+  theme(axis.title = element_blank(), 
+        axis.ticks = element_blank(), 
+        axis.line.x.bottom = element_blank(), 
+        axis.line.y = element_blank(), 
+        axis.text.y = element_blank(), 
+        axis.text = element_text(size = 7.5)) +
+  my_theme
+
+
+ggplot(normal_means_df, aes(x = Gene, y = mean_exp, fill = Gene)) +
+  geom_col() +
+  coord_polar() + 
+  labs(title = "Mean Gene Expression - Pregnancy Status: Normal") +
+  # need to clean up the plot 
+  # remove the x and y axis, the ticks, and numbers 
+  # need to make gene names smaller so they dont get cut off 
+  theme(axis.title = element_blank(), 
+        axis.ticks = element_blank(), 
+        axis.line.x.bottom = element_blank(), 
+        axis.line.y = element_blank(), 
+        axis.text.y = element_blank(), 
+        axis.text = element_text(size = 7.5)) +
+  my_theme
+  
 
 ```
 

@@ -7,7 +7,11 @@ output:
 author: Lauren Tuzik
 date: "2026-11-5"
 ---
-Extra Resources Used: Utilized AI for troubleshooting purposes. 
+
+Resource Disclosure: 
+ChatGPT (GPT-6) was utilized as a supplementary tool to assist with troubleshooting R code/errors, identifying ggplot functions, clarifying visualization concepts, organizing ideas, and refining wording of explanations. 
+The ggplot2 visualization website (https://r-graph-gallery.com/ggplot2-package.html) was utilized when choosing, creating, and identifying useful functions for the additional plot.
+Course material and lecture notes were used as references to support the application of methods and concepts that were used within the project. 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
